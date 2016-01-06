@@ -10,7 +10,7 @@
 
 <meta name="author" content="Sebastian Warnholz" />
 
-<meta name="date" content="2015-12-19" />
+<meta name="date" content="2016-01-06" />
 
 <title>Modules in R</title>
 
@@ -54,25 +54,25 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Modules in R</h1>
 <h4 class="author"><em>Sebastian Warnholz</em></h4>
-<h4 class="date"><em>2015-12-19</em></h4>
+<h4 class="date"><em>2016-01-06</em></h4>
 </div>
 
 
-<p><a href="https://travis-ci.org/wahani/modules"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAAAUCAYAAAAN+ioeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAABQBJREFUWIXdmH1ME2cAxp/76FF6DBhYIESgbHNJFRlMqIAIcWMjbhNs1pj0Dwgmi+jm4j70Dz/mHKvZnBl1cYBLE9YYCJNNggs6s/hFNGBjthCJHyPqFkFCVAKDtZSud+/+YDto7cdJmVSf5E3vvd/d0+d9cndpjzIYDJEcx5kVCoURQDTCQH++c36+I8yNXDQhg/wV+8h4IctxnJll2WpCyHzHkhROWUKSQqCQNpahIlEXWIZhjOG2sHDLE6qoJMcSlhASFo+LmXrSiiacm2LDcVHhmClU0YQQ+BtNTU1+mdwRyGMu/B+XEbBoALMybW5uluUxW///e3QU3J5zz6CPjmDcl4qLi5GcnCzLwxebzXfOpXL3L4A6XzmnnkGvaKPRCKvVCpPJBLVaLbGWlhaPY2fOOzs7fV61arUaJpMJVqsVRqPRgwUaJwoHsF6zHW35fTjwQgcSI1Ie4McL+9GY04Xs2CJpf0H8ajS8eBrHCm7BmnsRpYlGWezStvse3saULfg+7xoO515CztOrJJYUkYqvso6jLb8P6zXbcaJwwO8aghZtt9uh1+ths9lQUVHh97afOfe3XVlZie7ubuj1ejidTtlFA4BjZBKldYvR3XcOGzR7PPiyffHQfZGAPR2bUa2pkfZveXY/PvtpK1aaU/FW0xt4js2Wxbzzi+M0VtctwZendmKD5hOJVWtqcP76KZTWLYZz1B1wPUGLPnr0KHieR1tbG7RabUhFa7VatLe3g+d5tLa2PlTRLdfqEZExiZabX2NpTJ7EsmOL8MPmC+jeOohDhh+xkE+X2LHLzfiwZC92GfdBm/U89p7dIot55z/ca4Zy6d+wuU4iWaWR2JIYHVpvTuVqvnowtKJVKpXH539MFEVQFAVCCBQKhayiA/kFyxGZwAA0QWQCA0Kmz/tgUS0OnvkUheYUrKxNAU0xEmu48jG2tVfhRn8fKtO3wfT6IVnMOzOd6AZoAjZWBE3R04wAyqTpXCEVvWbNGiiVSpSXl6Onp0dig4OD0Ol04DgOZWVlsoru6enx8HuYog2pGxFJ81iX9jZ+7e+SGAclhBg7EnJ4vG/Y7eG54xUzotM5tP/eCPPZj7AsZpUs5p0f1L9Z4LWeOza8mVKNSJqHIW1TaEWLogiLxYKMjAw0NDRIrK6uDlVVVbBYLJiYmJBVdH19PTIzM2GxWOB2B36meecgDhpHVvQi66kimG07JFZ7bidq8hrxbV4XhoeHPTwv3/oFn+d8h5/X/YFdrx5Azcl3ZTF/+b3n5os7kBtTgiMresE5VXC47H7XQOn1er+/pYaGhsDzPBwOB1iWRWxsLBhm6haZnJzE2NgYRFFEVFQUxsfHkZSUJJ3na1sQBIyOjsLtdkOlUsFut0tsprzf3p1++R7yrXGYGBLARlKIWsSCiaCmctwTYb8tABSgTKQxMSAgfjkHAHDeFTExKEB0ETBKCqqFDLg4Oigbtrkkj5nb3nPBSTB+ww3apUBF8UasTH4NW38r89kltXbt2rD7v+td9JmS+3jp1IJ5ShNYZ0ruQyQCbo1ex+6TmzCkvurzuMfiXUemKRrxyxXzlCawMk3RAAWwKgr8MwxYQvk8jiWE/AUg6tHGCyzvouN07AP7wkVxOtZj7isn7WIJS9N0syAI1Y8qmByFa6mzFXs3ppceGRl5j2GYbyiKGpvvQE+aaBdLIu4suEzuiUX/AG3EJVuesFjhAAAAAElFTkSuQmCC" alt="Build Status" /></a> <a href="https://codecov.io/github/wahani/modules?branch=master"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NiIgaGVpZ2h0PSIyMCI+PGxpbmVhckdyYWRpZW50IGlkPSJiIiB4Mj0iMCIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2JiYiIgc3RvcC1vcGFjaXR5PSIuMSIgLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3Atb3BhY2l0eT0iLjEiIC8+PC9saW5lYXJHcmFkaWVudD48bWFzayBpZD0iYSI+PHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9IjIwIiByeD0iMyIgZmlsbD0iI2ZmZiIgLz48L21hc2s+PGcgbWFzaz0idXJsKCNhKSI+PHBhdGggZmlsbD0iIzU1NSIgZD0iTTAgMGg2MHYyMEgweiIgLz48cGF0aCBmaWxsPSIjNGMxIiBkPSJNNjAgMGgzNnYyMEg2MHoiIC8+PHBhdGggZmlsbD0idXJsKCNiKSIgZD0iTTAgMGg5NnYyMEgweiIgLz48L2c+PGcgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkRlamFWdSBTYW5zLFZlcmRhbmEsR2VuZXZhLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTEiPjx0ZXh0IHg9IjMwIiB5PSIxNSIgZmlsbD0iIzAxMDEwMSIgZmlsbC1vcGFjaXR5PSIuMyI+Q29kZWNvdjwvdGV4dD48dGV4dCB4PSIzMCIgeT0iMTQiPkNvZGVjb3Y8L3RleHQ+PHRleHQgeD0iNzciIHk9IjE1IiBmaWxsPSIjMDEwMTAxIiBmaWxsLW9wYWNpdHk9Ii4zIj4xMDAlPC90ZXh0Pjx0ZXh0IHg9Ijc3IiB5PSIxNCI+MTAwJTwvdGV4dD48L2c+PC9zdmc+" alt="codecov.io" /></a></p>
 <p>Provides modules as an organizational unit for source code. Modules enforce to be more rigorous when defining dependencies and have a local search path. They can be used as a sub unit within packages or in scripts.</p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
+<p>From CRAN:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;modules&quot;</span>)</code></pre>
 <p>From GitHub:</p>
 <pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;wahani/modules&quot;</span>)</code></pre>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>The key idea of this package is to provide a unit which is self contained, i.e. has it’s own scope. The main and most reliable infrastructure for such organizational units of source code in the R ecosystem is a package. Compared to a package modules can be considered ad hoc, but - in the sense of an R-package - self contained. Furthermore modules consist of one file; in contrast to a package which can wrap an arbitrary number of files.</p>
+<p>The key idea of this package is to provide a unit which is self contained, i.e. has it’s own scope. The main and most reliable infrastructure for such organizational units of source code in the R ecosystem is a package. Compared to a package modules can be considered ad hoc, but - in the sense of an R-package - self contained. Furthermore modules typically consist of one file; in contrast to a package which can wrap an arbitrary number of files.</p>
 <p>There are two use cases. First when you use modules to develop scripts, which is subject of this section; And then inside of packages where modules act more like objects, as in object-oriented-programming. Outside of packages modules know only of the base environment, i.e. within a module the base environment is the only <em>package</em> on the <em>search path</em>. Also they are always represented as a list inside R. Thus they can be treated as bags of functions.</p>
 <p>In the following examples you will see the function <code>module</code> to define modules. Typically you do not have to call that function explicitly but instead call <code>use</code> to load a module into your current session.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modules)</code></pre>
-<pre><code>## Loading required package: aoos</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modules)
+m &lt;-<span class="st"> </span><span class="kw">module</span>({
   boringFunction &lt;-<span class="st"> </span>function() <span class="kw">cat</span>(<span class="st">&quot;boring output&quot;</span>)
 })
 
@@ -158,31 +158,44 @@ cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class
 </div>
 <div id="scripts-as-modules" class="section level1">
 <h1>Scripts as modules</h1>
-<p>You can make scripts into modules with <code>as.module</code> or implicitly when you refer to a file in a call to <code>use</code>. Inside such a script you can use <code>import</code> and <code>use</code> in the same way you typically use <code>library</code>. A major difference is, that library will not only attach the stated package but also all packages in the depends field of that dependency. This is something you have to do manually (explicitly) with <code>import</code>. Consider the following example where we create a module in a temporary file with its dependencies.</p>
+<p>You can make scripts into modules with <code>as.module</code> or implicitly when you refer to a file (or directory) in a call to <code>use</code>. Inside such a script you can use <code>import</code> and <code>use</code> in the same way you typically use <code>library</code>. A major difference is, that library will not only attach the stated package but also all packages in the depends field of that dependency. This is something you have to do manually (explicitly) with <code>import</code>. Consider the following example where we create a module in a temporary file with its dependencies.</p>
 <pre class="sourceCode r"><code class="sourceCode r">code &lt;-<span class="st"> &quot;</span>
 <span class="st">import(methods)</span>
 <span class="st">import(aoos)</span>
-<span class="st"># This is an example:</span>
+<span class="st"># This is an example where we rely on functions in 'aoos':</span>
 <span class="st">list : generic(x) %g% standardGeneric('generic')</span>
 <span class="st">generic(x ~ ANY) %m% as.list(x)</span>
 <span class="st">&quot;</span>
 
-fileName &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
+fileName &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span class="dt">fileext =</span> <span class="st">&quot;.R&quot;</span>)
 <span class="kw">writeLines</span>(code, fileName)</code></pre>
-<p>Then we can attach such a module into this session by the following:</p>
-<pre class="sourceCode r"><code class="sourceCode r">someModule &lt;-<span class="st"> </span><span class="kw">use</span>(fileName, <span class="dt">attach =</span> <span class="ot">TRUE</span>)
-<span class="kw">search</span>()</code></pre>
-<pre><code>##  [1] &quot;.GlobalEnv&quot;        &quot;import:module&quot;     &quot;package:parallel&quot; 
-##  [4] &quot;package:modules&quot;   &quot;package:aoos&quot;      &quot;tools:rstudio&quot;    
-##  [7] &quot;package:stats&quot;     &quot;package:graphics&quot;  &quot;package:grDevices&quot;
-## [10] &quot;package:utils&quot;     &quot;package:datasets&quot;  &quot;package:methods&quot;  
-## [13] &quot;Autoloads&quot;         &quot;package:base&quot;</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">generic</span>(<span class="dv">1</span>:<span class="dv">2</span>)</code></pre>
+<p>Then we can load such a module into this session by the following:</p>
+<pre class="sourceCode r"><code class="sourceCode r">someModule &lt;-<span class="st"> </span><span class="kw">use</span>(fileName)
+someModule$<span class="kw">generic</span>(<span class="dv">1</span>:<span class="dv">2</span>)</code></pre>
 <pre><code>## [[1]]
 ## [1] 1
 ## 
 ## [[2]]
 ## [1] 2</code></pre>
+</div>
+<div id="documentation" class="section level1">
+<h1>Documentation</h1>
+<p>If you want proper documentation for your functions or modules you really want a package. However, there are some simple things you can do for ad-hoc documentation of modules which is to use comments:</p>
+<pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
+  fun &lt;-<span class="st"> </span>function(x) {
+    ## A function for illustrating documentation
+    ## x (numeric)
+    x
+  }
+})</code></pre>
+<p>There are print methods for modules and functions within modules:</p>
+<pre class="sourceCode r"><code class="sourceCode r">m</code></pre>
+<pre><code>## fun:
+## function(x)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">m$fun</code></pre>
+<pre><code>## function(x)
+## ## A function for illustrating documentation
+## ## x (numeric)</code></pre>
 </div>
 <div id="modules-in-packages" class="section level1">
 <h1>Modules in Packages</h1>
@@ -190,39 +203,41 @@ fileName &lt;-<span class="st"> </span><span class="kw">tempfile</span>()
 </div>
 <div id="modules-with-object-orientation" class="section level1">
 <h1>Modules with Object Orientation</h1>
-<p>S3 method dispatch will not work because of the special search mechanism of <code>UseMethod</code>. By default the set functions of the methods package have side effects in the top level environment. A module has only access to that environment in a package. Most of the syntactic sugar (S4) in aoos works:</p>
+<div id="s3" class="section level2">
+<h2>S3</h2>
+<p>S3 method dispatch will not work because of the special search mechanism of <code>UseMethod</code>. What will work, however, is attaching the module so <code>UseMethod</code> can find the methods.</p>
+<pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
+  generic &lt;-<span class="st"> </span>function(x) <span class="kw">UseMethod</span>(<span class="st">&quot;generic&quot;</span>)
+  generic.numeric &lt;-<span class="st"> </span>function(x) <span class="kw">cat</span>(<span class="st">&quot;method for x ~ numeric&quot;</span>)
+})
+<span class="co"># m$generic(1) # this won't work</span>
+<span class="kw">use</span>(m, <span class="dt">attach =</span> <span class="ot">TRUE</span>)
+m$<span class="kw">generic</span>(<span class="dv">1</span>)</code></pre>
+<pre><code>## method for x ~ numeric</code></pre>
+</div>
+<div id="s4" class="section level2">
+<h2>S4</h2>
+<p>More reliable is the dispatch in S4. By default the set functions of the methods package have side effects in the top level environment. So you would have to set the appropriate environemnt for the argument ‘where’. ‘aoos’ provides syntactic sugar (S4) and has side effects in the environment in which the constructor functions are called so method dispatch will work without extra work:</p>
 <pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
   <span class="kw">import</span>(<span class="st">&quot;methods&quot;</span>)
   <span class="kw">import</span>(<span class="st">&quot;aoos&quot;</span>)
   <span class="kw">gen</span>(x) %g%<span class="st"> </span><span class="kw">cat</span>(<span class="st">&quot;default method&quot;</span>)
-  <span class="kw">gen</span>(x ~<span class="st"> </span>numeric) %m%<span class="st"> </span><span class="kw">cat</span>(<span class="st">&quot;method for x ~ numerc&quot;</span>)
+  <span class="kw">gen</span>(x ~<span class="st"> </span>numeric) %m%<span class="st"> </span><span class="kw">cat</span>(<span class="st">&quot;method for x ~ numeric&quot;</span>)
 })
 m$<span class="kw">gen</span>(<span class="st">&quot;Hej&quot;</span>)</code></pre>
 <pre><code>## default method</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">m$<span class="kw">gen</span>(<span class="dv">1</span>)</code></pre>
-<pre><code>## method for x ~ numerc</code></pre>
-<p>S4 classes (or types in aoos) are not working correctly because it is terribly hard to understand the side effects of the implementation. Until now I was not able to isolate that. That means that up until now I have no clue how to define a S4 class inside a module. <code>setOldClass</code> with an appropriate where statement seems to work though:</p>
+<pre><code>## method for x ~ numeric</code></pre>
+<p>S4 classes (or types in aoos) have side effects in the global environment and S4 classes are searched for in the top level environment. This means that the module is not self-contained because the class definition will be cached somewhere else.</p>
 <pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
   <span class="kw">import</span>(<span class="st">&quot;methods&quot;</span>)
   <span class="kw">import</span>(<span class="st">&quot;aoos&quot;</span>)
-  <span class="kw">gen</span>(x) %g%<span class="st"> </span><span class="kw">cat</span>(<span class="st">&quot;default method&quot;</span>)
-  <span class="kw">gen</span>(x ~<span class="st"> </span>numeric) %m%<span class="st"> </span><span class="kw">cat</span>(<span class="st">&quot;method for x ~ numerc&quot;</span>)
-  NewType &lt;-<span class="st"> </span>function(x) <span class="kw">retList</span>(<span class="st">&quot;NewType&quot;</span>)
-  <span class="kw">setOldClass</span>(<span class="st">&quot;NewType&quot;</span>, <span class="dt">where =</span> <span class="kw">environment</span>())
-  <span class="kw">gen</span>(x ~<span class="st"> </span>NewType) %m%<span class="st"> </span>x
+  numeric :<span class="st"> </span><span class="kw">NewType</span>() %type%<span class="st"> </span>.Object
 })
-
-cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">1</span>)
-<span class="kw">clusterMap</span>(cl, m$gen, <span class="kw">list</span>(m$<span class="kw">NewType</span>(<span class="ot">NULL</span>)))</code></pre>
-<pre><code>## [[1]]
-## $x
-## NULL
-## 
-## attr(,&quot;.self&quot;)
-## &lt;environment: 0x1f8aa4c8&gt;
-## attr(,&quot;class&quot;)
-## [1] &quot;NewType&quot; &quot;list&quot;</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)</code></pre>
+m$<span class="kw">NewType</span>(<span class="dv">1</span>)</code></pre>
+<pre><code>## An object of class &quot;NewType&quot;
+## [1] 1</code></pre>
+</div>
 </div>
 
 

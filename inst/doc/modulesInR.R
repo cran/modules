@@ -2,6 +2,9 @@
 cat(gsub("\\n   ", "", packageDescription("modules", fields = "Description")))
 
 ## ---- eval=FALSE---------------------------------------------------------
+#  install.packages("modules")
+
+## ---- eval=FALSE---------------------------------------------------------
 #  devtools::install_github("wahani/modules")
 
 ## ------------------------------------------------------------------------
@@ -81,25 +84,46 @@ stopCluster(cl)
 code <- "
 import(methods)
 import(aoos)
-# This is an example:
+# This is an example where we rely on functions in 'aoos':
 list : generic(x) %g% standardGeneric('generic')
 generic(x ~ ANY) %m% as.list(x)
 "
 
-fileName <- tempfile()
+fileName <- tempfile(fileext = ".R")
 writeLines(code, fileName)
 
 ## ------------------------------------------------------------------------
-someModule <- use(fileName, attach = TRUE)
-search()
-generic(1:2)
+someModule <- use(fileName)
+someModule$generic(1:2)
+
+## ------------------------------------------------------------------------
+m <- module({
+  fun <- function(x) {
+    ## A function for illustrating documentation
+    ## x (numeric)
+    x
+  }
+})
+
+## ------------------------------------------------------------------------
+m
+m$fun
+
+## ------------------------------------------------------------------------
+m <- module({
+  generic <- function(x) UseMethod("generic")
+  generic.numeric <- function(x) cat("method for x ~ numeric")
+})
+# m$generic(1) # this won't work
+use(m, attach = TRUE)
+m$generic(1)
 
 ## ------------------------------------------------------------------------
 m <- module({
   import("methods")
   import("aoos")
   gen(x) %g% cat("default method")
-  gen(x ~ numeric) %m% cat("method for x ~ numerc")
+  gen(x ~ numeric) %m% cat("method for x ~ numeric")
 })
 m$gen("Hej")
 m$gen(1)
@@ -108,14 +132,7 @@ m$gen(1)
 m <- module({
   import("methods")
   import("aoos")
-  gen(x) %g% cat("default method")
-  gen(x ~ numeric) %m% cat("method for x ~ numerc")
-  NewType <- function(x) retList("NewType")
-  setOldClass("NewType", where = environment())
-  gen(x ~ NewType) %m% x
+  numeric : NewType() %type% .Object
 })
-
-cl <- makeCluster(1)
-clusterMap(cl, m$gen, list(m$NewType(NULL)))
-stopCluster(cl)
+m$NewType(1)
 
