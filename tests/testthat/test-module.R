@@ -43,7 +43,7 @@ test_that("Imports of module", {
 test_that("delayed assignment", {
   # test for delayed assignment
   m <- module({
-    import("delayed", "assignment") # does not exist!
+    import("base", "assignment") # does not exist!
     temp <- function() assignment
     checkExistens <- function() exists("assignment")
   })
@@ -54,6 +54,11 @@ test_that("delayed assignment", {
 })
 
 test_that("Attaching other module", {
+
+  expectEqual <- function(a, b) {
+    testthat::expect_equal(a, b)
+  }
+
   m1 <- module({
 
     import(modules, module)
@@ -62,22 +67,84 @@ test_that("Attaching other module", {
       fun <- function(x) x
     })
 
-    use(m, TRUE)
+    use(m, attach = TRUE)
 
     funNew <- function(x) fun(x)
 
+    m1 <- module({
+      fun <- function(x) x
+      fun1 <- function(x) x
+    })
+
+    use(m1, "fun1", attach = TRUE)
+
+    funNew1 <- function(x) fun1(x)
+
   })
 
-  expect_equal(m1$funNew(1), 1)
+  expectEqual(m1$funNew(1), 1)
+  expectEqual(m1$funNew1(1), 1)
+
+})
+
+test_that("exposure of module", {
+
+  expectEqual <- function(a, b) {
+    testthat::expect_equal(a, b)
+  }
+
+  m <- module({
+    import(modules, module)
+    m <- module({
+      .num <- NULL
+      set <- function(val) .num <<- val
+      get <- function() .num
+    })
+    expose(m, get, reInit = FALSE)
+  })
+
+  expectEqual(m$m$set(2), m$get())
+  expectEqual(names(m), c("get", "m"))
+
+})
+
+test_that("nested modules", {
+
+  expectEqual <- function(a, b) {
+    testthat::expect_equal(a, b)
+  }
+
+  val <- module({
+
+    import(stats, median)
+    import(modules, module)
+
+    # The nested module should be able to figure out, that it is inside a nested
+    # model and hence can connect:
+    m <- module({
+      fun <- function(x) median(x)
+    })
+
+  })$m$fun(1:10)
+
+  expectEqual(
+    val,
+    5.5
+  )
 
 })
 
 test_that("package dependencies", {
+
   m <- module({
     import("aoos")
     deps <- function() exists("%g%")
   })
-  expect_true(m$deps())
+
+  testthat::expect_true(m$deps())
+  testthat::expect_error(module({
+    import("DoesNotExist")
+  }), "'package:DoesNotExist' is not installed!")
 
 })
 

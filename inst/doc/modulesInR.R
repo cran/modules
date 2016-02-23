@@ -110,6 +110,63 @@ m
 m$fun
 
 ## ------------------------------------------------------------------------
+mutableModule <- module({
+  .num <- NULL
+  get <- function() .num
+  set <- function(val) .num <<- val
+})
+mutableModule$get()
+mutableModule$set(2)
+
+## ------------------------------------------------------------------------
+complectModule <- module({
+  use(.GlobalEnv$mutableModule, attach = TRUE)
+  getNum <- function() get()
+  set(3)
+})
+mutableModule$get()
+complectModule$getNum()
+
+## ------------------------------------------------------------------------
+complectModule <- module({
+  use(.GlobalEnv$mutableModule, attach = TRUE, reInit = FALSE)
+  getNum <- function() get()
+  set(3)
+})
+mutableModule$get()
+complectModule$getNum()
+
+## ------------------------------------------------------------------------
+complectModule <- module({
+  expose(.GlobalEnv$mutableModule, reInit = TRUE)
+  set(4)
+})
+mutableModule$get()
+complectModule$get()
+
+## ------------------------------------------------------------------------
+complectModule <- module({
+  expose(.GlobalEnv$mutableModule, reInit = FALSE)
+  set(1)
+})
+mutableModule$get()
+complectModule$get()
+
+## ------------------------------------------------------------------------
+m <- module({
+  
+  import("stats", "median")
+  import("modules", "module")
+  
+  anotherModule <- module({
+    fun <- function(x) median(x)
+  })
+  
+})
+
+m$anotherModule$fun(1:2)
+
+## ------------------------------------------------------------------------
 m <- module({
   generic <- function(x) UseMethod("generic")
   generic.numeric <- function(x) cat("method for x ~ numeric")

@@ -5,32 +5,41 @@
 #' \code{use} can be used to import other modules.
 #'
 #' @param expr an expression
-#' @param topEncl (environment) the root of the local search path
+#' @param topEncl (environment) the root of the local search path. It is tried
+#'   to find a good default via \link{autoTopEncl}.
 #' @param from (character, or unquoted expression) a package name
 #' @param ... (character, or unquoted expression) names to import from package
 #'   or names to export from module. For exports a character of length 1 with a
 #'   leading "^" is interpreted as regular expression.
 #' @param where (environment) important for testing
-#' @param module (character | list) a module as file- or folder-name or a list
+#' @param module (character | module) a module as file or folder name or a list
 #'   representing a module.
 #' @param attach (logical) whether to attach the module to the search path
 #' @param x a module
+#' @param reInit (logical) whether to re-initialize module. This argument is
+#'   passed to \link{as.module}.
 #'
 #' @details
-#' \code{topEncl} is the environment where the search of the module ends. This
-#' is  (most of the time) the base package. When
+#' \code{topEncl} is the environment where the search of the module ends.
+#' \code{autoTopEncl} handles the different situations. In general it defaults
+#' to the base environment or the environment from which \code{module} has been
+#' called. If you are using \code{use} or \code{expose} refering to a module in
+#' a file, it will always be the base environment. When
 #' \code{identical(topenv(parent.frame()), globalenv())} is false it (most
 #' likely) means that the module is part of a package. In that case the module
 #' defines a sub unit within a package but has access to the packages namespace.
-#' This is only relevant if you use the function module explicitly. Most likely
-#' you will instead use the function 'use' or 'as.module' instead, where the top
-#' enclosing environment is always base.
+#' This is relevant when you use the function module explicitly. When you define
+#' a nested module which the module will connect to the calling environment.
 #'
 #' \code{import} and \code{use} are no replacements for \link{library} and
 #' \link{attach}. Both will work when called in the \code{.GlobalEnv} but should
 #' only be used for development and debugging of modules.
 #'
 #' \code{export} will never export a function with a leading "." in its name.
+#'
+#' \code{expose} is similar to \code{use} but instead of attaching a module it
+#' will copy all elements into the calling environment. This means that all
+#' functions will be re-exported; if not stated otherwise using \code{export}.
 #'
 #' @examples
 #' \dontrun{
@@ -39,34 +48,9 @@
 #'
 #' @rdname module
 #' @export
-module <- function(expr = {}, topEncl = if (identical(topenv(parent.frame()), globalenv())) baseenv() else parent.frame()) {
+module <- function(expr = {}, topEncl = autoTopEncl(parent.frame())) {
 
-  evalInModule <- function(module, code) {
-    eval(code, envir = as.environment(module), enclos = emptyenv())
-    module
-  }
-
-  getExports <- function(module) {
-    exports <- get(nameExports(), envir = module, inherits = TRUE)
-    if (length(exports) == 1 && grepl("\\^", exports)) ls(module, pattern = "^*")
-    else exports
-  }
-
-  wrapModfun <- function(module) {
-    # wrap all functions in a module with the class modfun.
-    mapInEnv(module, modfun, is.function)
-  }
-
-  expr <- match.call()[[2]]
-  module <- ModuleScope(parent = ModuleParent(topEncl))
-  module <- evalInModule(module, expr)
-  module <- wrapModfun(module)
-
-  stripSelf(retList(
-    "module",
-    public = getExports(module),
-    envir = module
-  ))
+  ModuleConst(match.call()$expr, topEncl) %invoke% new()
 
 }
 
@@ -104,20 +88,32 @@ import <- function(from, ..., where = parent.frame()) {
     deleteQuotes(from)
   }
 
+  isNotInstalled <- function(pkg) {
+    !is.element(pkg, installed.packages()[, "Package"])
+  }
+
   from <- deparseFrom(match.call())
+  if (isNotInstalled(from)) stop("'package:", from, "' is not installed! Intall first.")
   objectsToImport <- makeObjectsToImport(match.call(), from)
-
   addDependency(from, objectsToImport, where, makeDelayedAssignment, from)
-
   invisible(NULL)
 
 }
 
 #' @export
 #' @rdname module
-use <- function(module, attach = FALSE, ..., where = parent.frame()) {
+use <- function(module, ..., attach = FALSE, reInit = TRUE, where = parent.frame()) {
+
+  keepOnlySelection <- function(module, mc) {
+    namesToImport <- deparseEllipsis(mc, c("module", "attach", "reInit", "where"))
+    if (length(namesToImport) == 0) module
+    else module[namesToImport]
+  }
+
   name <- if (is.character(module)) module else as.character(substitute(module))
-  module <- as.module(module, ...)
+  module <- as.module(module, reInit = reInit)
+  module <- keepOnlySelection(module, match.call(expand.dots = TRUE))
+
   if (attach) addDependency(
     module,
     names(module),
@@ -125,24 +121,36 @@ use <- function(module, attach = FALSE, ..., where = parent.frame()) {
     makeAssignment,
     name
   )
+
   invisible(module)
+
+}
+
+#' @export
+#' @rdname module
+expose <- function(module, ..., reInit = TRUE, where = parent.frame()) {
+
+  mc <- match.call(expand.dots = TRUE)
+  mc[[1]] <- quote(use)
+  module <- eval(mc, where)
+
+  makeAssignment(module, names(module), where)
+  invisible(NULL)
 }
 
 #' @export
 #' @rdname module
 export <- function(..., where = parent.frame()) {
-
-  deparseExports <- function(mc) {
-    args <- Map(deparse, mc)
-    args[[1]] <- NULL
-    args$where <- NULL
-    args <- unlist(args)
-    deleteQuotes(args)
-  }
-
-  objectsToExport <- deparseExports(match.call())
+  objectsToExport <- deparseEllipsis(match.call(), "where")
   assign(nameExports(), objectsToExport, envir = where)
-
   invisible(NULL)
+}
 
+#' @export
+#' @rdname module
+autoTopEncl <- function(where) {
+  # if .__exports__ exists I assume it is a nested module:
+  if (exists(nameExports(), where = where)) where
+  else if (identical(topenv(where), globalenv())) baseenv()
+  else where
 }

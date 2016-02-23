@@ -1,6 +1,5 @@
 ---
 title: "Modules in R"
-author: "Sebastian Warnholz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -208,9 +207,121 @@ m$fun
 ```
 
 
+# Modules and Coupling
+
+Best is to only use `::` and `use` with `attach = FALSE` to be explicit with 
+your dependencies. However, there are some other options you have, which will 
+stronger forms of coupling between modules.
+
+## Modules to Model Mutable State
+
+This is in itself abstract but in principle you can not only put functions in
+your bag (module) but any R-object. This transforms into something which is
+probably associated with object-orientation. You can like this or not, here I
+simply use it to illustrate the strongest form of coupling between two modules I
+can come up with. 
+
+In the following I define a module to encapsulate some value and have a *get*
+and *set* method for it:
+
+```{r}
+mutableModule <- module({
+  .num <- NULL
+  get <- function() .num
+  set <- function(val) .num <<- val
+})
+mutableModule$get()
+mutableModule$set(2)
+```
+
+## Coupling Between Modules
+
+In the next module we can use `mutableModule` and rebuild the interface to
+`.num`.
+
+```{r}
+complectModule <- module({
+  use(.GlobalEnv$mutableModule, attach = TRUE)
+  getNum <- function() get()
+  set(3)
+})
+mutableModule$get()
+complectModule$getNum()
+```
+
+Depending on your expectations with respect to the above code it comes at a
+surprise that we can get and set that value from an attached module; Furthermore
+it is not changed in `mutableModule`. This is because `use` will trigger a
+re-initialization of any module you plug in. You can consciously override this
+behaviour:
+
+```{r}
+complectModule <- module({
+  use(.GlobalEnv$mutableModule, attach = TRUE, reInit = FALSE)
+  getNum <- function() get()
+  set(3)
+})
+mutableModule$get()
+complectModule$getNum()
+```
+
+This is not all we can do. we can make the coupling stronger using `expose`. 
+This function will take everything in a module and expose it (spam) the
+environment from which it is called.
+
+```{r}
+complectModule <- module({
+  expose(.GlobalEnv$mutableModule, reInit = TRUE)
+  set(4)
+})
+mutableModule$get()
+complectModule$get()
+```
+
+And of course we can do this with `reInit = FALSE` should this be desirable. In
+this case both modules are essentially the same.
+
+```{r}
+complectModule <- module({
+  expose(.GlobalEnv$mutableModule, reInit = FALSE)
+  set(1)
+})
+mutableModule$get()
+complectModule$get()
+```
+
+
+# Nested Modules
+
+You can also write nested modules, which means you define modules inside
+modules. In this case dependencies of the top level module are accessible to its
+children:
+
+```{r}
+m <- module({
+  
+  import("stats", "median")
+  import("modules", "module")
+  
+  anotherModule <- module({
+    fun <- function(x) median(x)
+  })
+  
+})
+
+m$anotherModule$fun(1:2)
+```
+
+
 # Modules in Packages
 
-...
+When you use modules inside a R-package the search path of a module connects to 
+the packages namespace. So it sees all objects within the package and has access
+to all its dependencies. You can always change this by specifying the argument 
+`topEncl`. Do not use `import` inside this setting but instead rely on the 
+package to handle your dependencies. Attaching other modules using `use` and 
+`expose` can make sense but is a matter of preference. You should definitely not
+rely on modules in files and load them with `use`!
 
 
 # Modules with Object Orientation
@@ -235,7 +346,7 @@ m$generic(1)
 
 More reliable is the dispatch in S4. By default the set functions of the methods
 package have side effects in the top level environment. So you would have to set
-the appropriate environemnt for the argument 'where'. 'aoos' provides syntactic 
+the appropriate environment for the argument 'where'. 'aoos' provides syntactic 
 sugar (S4) and has side effects in the environment in which the constructor 
 functions are called so method dispatch will work without extra work:
 

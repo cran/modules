@@ -4,21 +4,33 @@
 \name{as.module}
 \alias{as.module}
 \alias{as.module,character-method}
+\alias{as.module,module-method}
 \title{Coercion for Modules}
 \usage{
-as.module(x, topEncl = baseenv(), ...)
+as.module(x, topEncl = baseenv(), reInit = TRUE, ...)
 
-\S4method{as.module}{character}(x, topEncl = baseenv(), ...)
+\S4method{as.module}{character}(x, topEncl = baseenv(), reInit = TRUE, ...)
+
+\S4method{as.module}{module}(x, topEncl = baseenv(), reInit = TRUE, ...)
 }
 \arguments{
 \item{x}{something which can be coerced into a module. \code{character} are
-interpreted as file names.}
+interpreted as file / folder names.}
 
-\item{topEncl}{(environment) the root of the local search path}
+\item{topEncl}{(environment) the root of the local search path. It is tried
+to find a good default via \link{autoTopEncl}.}
+
+\item{reInit}{(logical) if a module should be re-initialized}
 
 \item{...}{arguments passed to \link{parse}}
 }
 \description{
 Interfaces to and from modules.
+}
+\examples{
+# as.module is used by 'use' so see the vignette for examples:
+\dontrun{
+vignette("modulesInR", "modules")
+}
 }
 
