@@ -93,7 +93,7 @@ import <- function(from, ..., where = parent.frame()) {
   }
 
   from <- deparseFrom(match.call())
-  if (isNotInstalled(from)) stop("'package:", from, "' is not installed! Intall first.")
+  if (isNotInstalled(from)) stop("'package:", from, "' is not installed! Install first.")
   objectsToImport <- makeObjectsToImport(match.call(), from)
   addDependency(from, objectsToImport, where, makeDelayedAssignment, from)
   invisible(NULL)
@@ -142,7 +142,9 @@ expose <- function(module, ..., reInit = TRUE, where = parent.frame()) {
 #' @rdname module
 export <- function(..., where = parent.frame()) {
   objectsToExport <- deparseEllipsis(match.call(), "where")
-  assign(nameExports(), objectsToExport, envir = where)
+  currentExports <- get(nameExports(), envir = where)
+  currentExports <- currentExports[currentExports != "^*"]
+  assign(nameExports(), c(currentExports, objectsToExport), envir = where)
   invisible(NULL)
 }
 

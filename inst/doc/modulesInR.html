@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="date" content="2016-02-22" />
+<meta name="date" content="2016-02-10" />
 
 <title>Modules in R</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <div id="header">
 <h1 class="title">Modules in R</h1>
-<h4 class="date"><em>2016-02-22</em></h4>
+<h4 class="date"><em>2016-02-10</em></h4>
 </div>
 
 
@@ -87,9 +87,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The key idea of this package is to provide a unit which is self contained, i.e. has it’s own scope. The main and most reliable infrastructure for such organizational units of source code in the R ecosystem is a package. Compared to a package modules can be considered ad hoc, but - in the sense of an R-package - self contained. Furthermore modules typically consist of one file; in contrast to a package which can wrap an arbitrary number of files.</p>
 <p>There are two use cases. First when you use modules to develop scripts, which is subject of this section; And then inside of packages where modules act more like objects, as in object-oriented-programming. Outside of packages modules know only of the base environment, i.e. within a module the base environment is the only <em>package</em> on the <em>search path</em>. Also they are always represented as a list inside R. Thus they can be treated as bags of functions.</p>
 <p>In the following examples you will see the function <code>module</code> to define modules. Typically you do not have to call that function explicitly but instead call <code>use</code> to load a module into your current session.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modules)</code></pre></div>
-<pre><code>## Loading required package: aoos</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(modules)
+m &lt;-<span class="st"> </span><span class="kw">module</span>({
   boringFunction &lt;-<span class="st"> </span>function() <span class="kw">cat</span>(<span class="st">&quot;boring output&quot;</span>)
 })
 
