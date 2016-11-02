@@ -8,31 +8,6 @@ deparseEllipsis <- function(mc, exclude) {
   deleteQuotes(args)
 }
 
-invoke(lhs, rhs) %g% standardGeneric("invoke")
-
-invoke(lhs ~ module, rhs) %m% {
-  expr <- match.call()$rhs
-  eval(expr, attr(lhs, "moduleConst"), enclos = parent.frame())
-}
-
-invoke(lhs ~ ModuleConst, rhs) %m% {
-  expr <- match.call()$rhs
-  eval(expr, lhs, enclos = parent.frame())
-}
-
-
-"%invoke%" <- invoke
-
-mapInEnv <- function(x, f, p, ...) {
-  env <- as.environment(x)
-  ind <- unlist(eapply(env, p))
-  objToBeChanged <- ls(x, sorted = FALSE)[ind]
-  obj <- mget(objToBeChanged, env, "any")
-  mapply(assign, x = objToBeChanged, value = lapply(obj, f),
-         MoreArgs = list(envir = env))
-  x
-}
-
 deleteQuotes <- function(x) {
   gsub("\\\"|\\\'", "", x)
 }

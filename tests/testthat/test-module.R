@@ -8,7 +8,7 @@ test_that("Isolation of module", {
   expect_true(exists("fun", m))
 
   # module does not know of the outside world. This is so in interactive mode.
-  # In a apckage it is the enclosing env. The test env is not interactive.
+  # In a package it is the enclosing env. The test env is not interactive.
   x <- 1
   m <- module({
     fun <- function() try(x, silent = TRUE)
@@ -38,6 +38,16 @@ test_that("Imports of module", {
   expect_true(exists("module", environment(m$fun)))
   expect_true(Negate(exists)("module", environment(m$fun), inherits = FALSE))
 
+  m <- module({
+    here <- environment()
+    m <- import("utils", ".S3methods", attach = FALSE)
+    importPackage <- function() names(m) == ".S3methods"
+    importPackageAttach <- function() !exists(".S3methods", where = here, inherits = FALSE)
+  })
+
+  testthat::expect_true(m$importPackage())
+  testthat::expect_true(m$importPackageAttach())
+    
 })
 
 test_that("delayed assignment", {
@@ -120,7 +130,7 @@ test_that("nested modules", {
     import(modules, module)
 
     # The nested module should be able to figure out, that it is inside a nested
-    # model and hence can connect:
+    # module and hence can connect:
     m <- module({
       fun <- function(x) median(x)
     })
@@ -137,8 +147,8 @@ test_that("nested modules", {
 test_that("package dependencies", {
 
   m <- module({
-    import("aoos")
-    deps <- function() exists("%g%")
+    import("utils")
+    deps <- function() exists("packageDescription")
   })
 
   testthat::expect_true(m$deps())

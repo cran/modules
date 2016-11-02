@@ -8,19 +8,18 @@ cat(gsub("\\n   ", "", packageDescription("modules", fields = "Description")))
 #  devtools::install_github("wahani/modules")
 
 ## ------------------------------------------------------------------------
-library(modules)
+library("modules")
 m <- module({
-  boringFunction <- function() cat("boring output")
+  boringFunction <- function() "boring output"
 })
-
 m$boringFunction()
 
 ## ----error=TRUE----------------------------------------------------------
-hey <- "hey"
+x <- "hey"
 m <- module({
-  isolatedFunction <- function() hey
+  someFunction <- function() x
 })
-m$isolatedFunction()
+m$someFunction()
 
 ## ------------------------------------------------------------------------
 m <- module({
@@ -31,7 +30,7 @@ m$functionWithDep(1:10)
 ## ------------------------------------------------------------------------
 m <- module({
  
-  import(stats, median) # make median from package stats available
+  import("stats", "median") # make median from package stats available
   
   functionWithDep <- function(x) median(x)
 
@@ -41,7 +40,7 @@ m$functionWithDep(1:10)
 ## ------------------------------------------------------------------------
 m <- module({
   
-  import(stats)
+  import("stats")
   
   functionWithDep <- function(x) median(x)
 
@@ -52,17 +51,19 @@ m$functionWithDep(1:10)
 m <- module({
   
   export("fun")
-  
-  .privateFunction <- identity
+
+  fun <- identity # public
   privateFunction <- identity
-  fun <- identity
+  
+  # .named are always private
+  .privateFunction <- identity
   
 })
 
 names(m)
 
 ## ----error=TRUE----------------------------------------------------------
-library(parallel)
+library("parallel")
 dependency <- identity
 fun <- function(x) dependency(x) 
 
@@ -82,22 +83,33 @@ stopCluster(cl)
 
 ## ------------------------------------------------------------------------
 code <- "
-import(methods)
-import(aoos)
-# This is an example where we rely on functions in 'aoos':
-list : generic(x) %g% standardGeneric('generic')
-generic(x ~ ANY) %m% as.list(x)
+import('stats', 'median')
+functionWithDep <- function(x) median(x)
 "
 
 fileName <- tempfile(fileext = ".R")
 writeLines(code, fileName)
 
 ## ------------------------------------------------------------------------
-someModule <- use(fileName)
-someModule$generic(1:2)
+m <- use(fileName)
+m$functionWithDep(1:2)
 
 ## ------------------------------------------------------------------------
 m <- module({
+  
+  import("stats", "median")
+  import("modules", "module")
+  
+  anotherModule <- module({
+    fun <- function(x) median(x)
+  })
+  
+})
+
+m$anotherModule$fun(1:2)
+
+## ------------------------------------------------------------------------
+module({
   fun <- function(x) {
     ## A function for illustrating documentation
     ## x (numeric)
@@ -106,8 +118,12 @@ m <- module({
 })
 
 ## ------------------------------------------------------------------------
-m
-m$fun
+m <- module({
+  .generic <- function(x) UseMethod("generic")
+  generic.numeric <- function(x) cat("method for x ~ numeric")
+  generic <- function(x) .generic(x)
+})
+m$generic(1)
 
 ## ------------------------------------------------------------------------
 mutableModule <- module({
@@ -151,45 +167,4 @@ complectModule <- module({
 })
 mutableModule$get()
 complectModule$get()
-
-## ------------------------------------------------------------------------
-m <- module({
-  
-  import("stats", "median")
-  import("modules", "module")
-  
-  anotherModule <- module({
-    fun <- function(x) median(x)
-  })
-  
-})
-
-m$anotherModule$fun(1:2)
-
-## ------------------------------------------------------------------------
-m <- module({
-  generic <- function(x) UseMethod("generic")
-  generic.numeric <- function(x) cat("method for x ~ numeric")
-})
-# m$generic(1) # this won't work
-use(m, attach = TRUE)
-m$generic(1)
-
-## ------------------------------------------------------------------------
-m <- module({
-  import("methods")
-  import("aoos")
-  gen(x) %g% cat("default method")
-  gen(x ~ numeric) %m% cat("method for x ~ numeric")
-})
-m$gen("Hej")
-m$gen(1)
-
-## ------------------------------------------------------------------------
-m <- module({
-  import("methods")
-  import("aoos")
-  numeric : NewType() %type% .Object
-})
-m$NewType(1)
 
