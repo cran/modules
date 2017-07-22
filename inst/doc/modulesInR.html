@@ -4,14 +4,14 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-<meta name="date" content="2016-11-01" />
+<meta name="date" content="2017-07-18" />
 
 <title>Modules in R</title>
 
@@ -68,7 +68,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Modules in R</h1>
-<h4 class="date"><em>2016-11-01</em></h4>
+<h4 class="date"><em>2017-07-18</em></h4>
 
 
 
@@ -78,7 +78,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>From CRAN:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;modules&quot;</span>)</code></pre></div>
 <p>From GitHub:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;wahani/modules&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if (<span class="kw">require</span>(<span class="st">&quot;devtools&quot;</span>)) <span class="kw">install_github</span>(<span class="st">&quot;wahani/modules&quot;</span>)</code></pre></div>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -108,18 +108,18 @@ m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class=
 <pre><code>## [1] 5.5</code></pre>
 <p>Or you can use <code>import</code> for <em>attaching</em> single objects or packages and <code>use</code> for <em>attaching</em> or loading a module:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
- 
+
   <span class="kw">import</span>(<span class="st">&quot;stats&quot;</span>, <span class="st">&quot;median&quot;</span>) <span class="co"># make median from package stats available</span>
-  
+
   functionWithDep &lt;-<span class="st"> </span>function(x) <span class="kw">median</span>(x)
 
 })
 m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
 <pre><code>## [1] 5.5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  
+
   <span class="kw">import</span>(<span class="st">&quot;stats&quot;</span>)
-  
+
   functionWithDep &lt;-<span class="st"> </span>function(x) <span class="kw">median</span>(x)
 
 })
@@ -130,15 +130,15 @@ m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class=
 <h2>Exports</h2>
 <p>It may also be of interest to control which objects are visible for the client. You can do that with the <code>export</code> function. Note that export accepts regular expressions which are indicated by a leading ‘^’.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  
+
   <span class="kw">export</span>(<span class="st">&quot;fun&quot;</span>)
 
   fun &lt;-<span class="st"> </span>identity <span class="co"># public</span>
   privateFunction &lt;-<span class="st"> </span>identity
-  
+
   <span class="co"># .named are always private</span>
   .privateFunction &lt;-<span class="st"> </span>identity
-  
+
 })
 
 <span class="kw">names</span>(m)</code></pre></div>
@@ -198,18 +198,30 @@ m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class=
 <h1>Nested Modules</h1>
 <p>You can also write nested modules, which means you define modules inside modules. In this case dependencies of the top level module are accessible to its children:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  
+
   <span class="kw">import</span>(<span class="st">&quot;stats&quot;</span>, <span class="st">&quot;median&quot;</span>)
   <span class="kw">import</span>(<span class="st">&quot;modules&quot;</span>, <span class="st">&quot;module&quot;</span>)
-  
+
   anotherModule &lt;-<span class="st"> </span><span class="kw">module</span>({
     fun &lt;-<span class="st"> </span>function(x) <span class="kw">median</span>(x)
   })
-  
+
 })
 
 m$anotherModule$<span class="kw">fun</span>(<span class="dv">1</span>:<span class="dv">2</span>)</code></pre></div>
 <pre><code>## [1] 1.5</code></pre>
+</div>
+<div id="parameterized-modules" class="section level1">
+<h1>Parameterized Modules</h1>
+<p>Sometimes it can be useful to pass arguments to a module. If you have a background in object oriented programming you may find this natural. From a functional perspective we define parameters shared by a list of closures. This is achieved by making the enclosing environment of the module available to the module itself. Note that inside a package this would be the default behaviour.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span>function(param) {
+  <span class="kw">module</span>(<span class="dt">topEncl =</span> <span class="kw">environment</span>(), {
+    fun &lt;-<span class="st"> </span>function() param
+  })
+}
+
+<span class="kw">m</span>(<span class="dv">1</span>)$<span class="kw">fun</span>()</code></pre></div>
+<pre><code>## [1] 1</code></pre>
 </div>
 <div id="documentation" class="section level1">
 <h1>Documentation</h1>
@@ -234,7 +246,7 @@ m$anotherModule$<span class="kw">fun</span>(<span class="dv">1</span>:<span clas
 <h1>Modules with Object Orientation</h1>
 <div id="s3" class="section level2">
 <h2>S3</h2>
-<p>S3 method dispatch can be problamatic because of the special search mechanism of <code>UseMethod</code>. What will work, however, is wrapping the generic function in a wrapper function.</p>
+<p>S3 method dispatch can be problematic because of the special search mechanism of <code>UseMethod</code>. What will work, however, is wrapping the generic function in a wrapper function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
   .generic &lt;-<span class="st"> </span>function(x) <span class="kw">UseMethod</span>(<span class="st">&quot;generic&quot;</span>)
   generic.numeric &lt;-<span class="st"> </span>function(x) <span class="kw">cat</span>(<span class="st">&quot;method for x ~ numeric&quot;</span>)
@@ -314,7 +326,7 @@ mutableModule$<span class="kw">get</span>()</code></pre></div>
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

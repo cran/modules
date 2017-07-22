@@ -1,12 +1,12 @@
 #' Define Modules in R
 #'
-#' Use \code{module} to define self contained organizational units. Modules have
+#' Use \code{module} to define self contained organisational units. Modules have
 #' their own search path. \code{import} can be used to import packages.
 #' \code{use} can be used to import other modules. Use \code{export} to define
 #' which objects to export. \code{expose} can be used to reuse function
 #' definitions from another module.
 #'
-#' @param expr an expression
+#' @param expr,with an expression
 #' @param topEncl (environment) the root of the local search path. It is tried
 #'   to find a good default via \link{autoTopEncl}.
 #' @param from (character, or unquoted expression) a package name
@@ -26,7 +26,7 @@
 #' \code{topEncl} is the environment where the search of the module ends.
 #' \code{autoTopEncl} handles the different situations. In general it defaults
 #' to the base environment or the environment from which \code{module} has been
-#' called. If you are using \code{use} or \code{expose} refering to a module in
+#' called. If you are using \code{use} or \code{expose} referring to a module in
 #' a file, it will always be the base environment. When
 #' \code{identical(topenv(parent.frame()), globalenv())} is false it (most
 #' likely) means that the module is part of a package. In that case the module
@@ -45,6 +45,11 @@
 #' \code{expose} is similar to \code{use} but instead of attaching a module it
 #' will copy all elements into the calling environment. This means that
 #' \emph{exposed} functions can be (re-)exported.
+#'
+#' \code{extend} can be used to extend an existing module definition. This
+#' feature is meant to be used by a module author to split a module definition
+#' into different files. You can also refer to a folder name in \code{use} which
+#' is interpreted to use all files as sub-modules.
 #'
 #' @examples
 #' \dontrun{
@@ -76,15 +81,12 @@
 #' @rdname module
 #' @export
 module <- function(expr = {}, topEncl = autoTopEncl(parent.frame())) {
-
-  moduleConstructor <- ModuleConst(match.call()$expr, topEncl)
-  moduleConstructor$new()
-
+  ModuleConst(match.call()$expr, topEncl)
 }
 
 #' @export
 print.module <- function(x, ...) {
-  
+
   getFormals <- function(fun) {
     formalsOfFun <- formals(fun)
     formalsOfFun[sapply(formalsOfFun, is.character)] <-
@@ -114,7 +116,7 @@ print.module <- function(x, ...) {
       cat("\n", sep = "")
     }
   }
-  
+
   catRemaining <- function(remaining) {
     for (i in seq_along(remaining)) {
       cat(paste0(names(remaining)[i], ":\n"))
@@ -126,102 +128,16 @@ print.module <- function(x, ...) {
   ind <- vapply(x, is.function, logical(1))
   catFuns(x[ind])
   catRemaining(x[!ind])
-  
+
   invisible(x)
-  
-}
 
-#' @rdname module
-#' @export
-import <- function(from, ..., attach = TRUE, where = parent.frame()) {
-
-  deparseImports <- function(mc) {
-    args <- Map(deparse, mc)
-    args[[1]] <- NULL
-    args$from <- NULL
-    args$where <- NULL
-    args$attach <- NULL
-    args <- unlist(args)
-    deleteQuotes(args)
-  }
-
-  makeObjectsToImport <- function(mc, from) {
-    objectsToImport <- deparseImports(mc)
-    if (length(objectsToImport) == 0) getNamespaceExports(from)
-    else objectsToImport
-  }
-
-  deparseFrom <- function(mc) {
-    from <- Map(deparse, mc)$from
-    deleteQuotes(from)
-  }
-
-  isNotInstalled <- function(pkg) {
-    !is.element(pkg, installed.packages()[, "Package"])
-  }
-
-  from <- deparseFrom(match.call())
-  if (isNotInstalled(from)) stop("'package:", from, "' is not installed! Install first.")
-  if (!attach) where <- new.env()
-  objectsToImport <- makeObjectsToImport(match.call(), from)
-  addDependency(from, objectsToImport, where, makeDelayedAssignment, from)
-  invisible(parent.env(where))
-
-}
-
-#' @export
-#' @rdname module
-use <- function(module, ..., attach = FALSE, reInit = TRUE, where = parent.frame()) {
-
-  keepOnlySelection <- function(module, mc) {
-    namesToImport <- deparseEllipsis(mc, c("module", "attach", "reInit", "where"))
-    if (length(namesToImport) == 0) module
-    else module[namesToImport]
-  }
-
-  name <- if (is.character(module)) module else as.character(substitute(module))
-  module <- as.module(module, reInit = reInit)
-  module <- keepOnlySelection(module, match.call(expand.dots = TRUE))
-
-  if (attach) addDependency(
-    module,
-    names(module),
-    where,
-    makeAssignment,
-    name
-  )
-
-  invisible(module)
-
-}
-
-#' @export
-#' @rdname module
-expose <- function(module, ..., reInit = TRUE, where = parent.frame()) {
-
-  mc <- match.call(expand.dots = TRUE)
-  mc[[1]] <- quote(modules::use)
-  module <- eval(mc, where)
-
-  makeAssignment(module, names(module), where)
-  invisible(NULL)
-}
-
-#' @export
-#' @rdname module
-export <- function(..., where = parent.frame()) {
-  objectsToExport <- deparseEllipsis(match.call(), "where")
-  currentExports <- get(nameExports(), envir = where)
-  currentExports <- currentExports[currentExports != "^*"]
-  assign(nameExports(), c(currentExports, objectsToExport), envir = where)
-  invisible(NULL)
 }
 
 #' @export
 #' @rdname module
 autoTopEncl <- function(where) {
   # if .__exports__ exists I assume it is a nested module:
-  if (exists(nameExports(), where = where)) where
+  if (exists(exportNameWithinModule(), where = where)) where
   else if (identical(topenv(where), globalenv())) baseenv()
   else where
 }

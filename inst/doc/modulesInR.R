@@ -5,7 +5,7 @@ cat(gsub("\\n   ", "", packageDescription("modules", fields = "Description")))
 #  install.packages("modules")
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  devtools::install_github("wahani/modules")
+#  if (require("devtools")) install_github("wahani/modules")
 
 ## ------------------------------------------------------------------------
 library("modules")
@@ -29,9 +29,9 @@ m$functionWithDep(1:10)
 
 ## ------------------------------------------------------------------------
 m <- module({
- 
+
   import("stats", "median") # make median from package stats available
-  
+
   functionWithDep <- function(x) median(x)
 
 })
@@ -39,9 +39,9 @@ m$functionWithDep(1:10)
 
 ## ------------------------------------------------------------------------
 m <- module({
-  
+
   import("stats")
-  
+
   functionWithDep <- function(x) median(x)
 
 })
@@ -49,15 +49,15 @@ m$functionWithDep(1:10)
 
 ## ------------------------------------------------------------------------
 m <- module({
-  
+
   export("fun")
 
   fun <- identity # public
   privateFunction <- identity
-  
+
   # .named are always private
   .privateFunction <- identity
-  
+
 })
 
 names(m)
@@ -96,17 +96,26 @@ m$functionWithDep(1:2)
 
 ## ------------------------------------------------------------------------
 m <- module({
-  
+
   import("stats", "median")
   import("modules", "module")
-  
+
   anotherModule <- module({
     fun <- function(x) median(x)
   })
-  
+
 })
 
 m$anotherModule$fun(1:2)
+
+## ------------------------------------------------------------------------
+m <- function(param) {
+  module(topEncl = environment(), {
+    fun <- function() param
+  })
+}
+
+m(1)$fun()
 
 ## ------------------------------------------------------------------------
 module({

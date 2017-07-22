@@ -1,14 +1,14 @@
 ModuleParent <- function(parent = baseenv()) {
-
   obj <- new.env(parent = parent)
-
+  # The following objects are made available by default. They can be masked by
+  # other imports.
   makeDelayedAssignment("modules", "import", into = obj)
   makeDelayedAssignment("modules", "use", into = obj)
   makeDelayedAssignment("modules", "expose", into = obj)
   makeDelayedAssignment("modules", "export", into = obj)
   
   obj
-  
+
 }
 
 ModuleScope <- function(parent = ModuleParent()) {
@@ -16,44 +16,30 @@ ModuleScope <- function(parent = ModuleParent()) {
   # module
   obj <- new.env(parent = parent)
   # Here are also the flags. Because of imports it might be hard to find the
-  # original name-value for the exports. And to avoid multiple copies it is
-  # directly in the module env. The value can be changed by 'expose'.
-  assign(nameExports(), "^*", envir = obj)
+  # original name-value for the exports.
+  assign(exportNameWithinModule(), "^*", envir = obj)
   obj
 }
 
 ModuleConst <- function(expr, topEncl) {
-  # expr
-  # topEncl: environment
 
   evalInModule <- function(module, code) {
     eval(code, envir = as.environment(module), enclos = emptyenv())
     module
   }
 
-  getExports <- function(module) {
-    exports <- get(nameExports(), envir = module)
-    if (length(exports) == 1 && grepl("^\\^", exports)) ls(module, pattern = exports)
-    else exports
-  }
-
-  addModuleConst <- function(module) {
-    # This adds the moduleConst as an attribute to give each new module the
-    # possibility to create new instances.
-    attr(module, "moduleConst") <- moduleConst
+  addMetaData <- function(module) {
+    # This adds attributes to give each new module the necessary
+    # information to construct a sibling
+    attr(module, "expr") <- expr
+    attr(module, "topEncl") <- topEncl
     module
   }
 
-  new <- function() {
-    
-    module <- ModuleScope(parent = ModuleParent(topEncl))
-    module <- evalInModule(module, expr)
-    module <- retList("module", public = getExports(module), envir = module)
-    addModuleConst(module)
-
-  }
-
-  moduleConst <- retList("ModuleConst", "new")
-  moduleConst
+  module <- ModuleScope(parent = ModuleParent(topEncl))
+  module <- evalInModule(module, expr)
+  module <- exportExtract2List(module)
+  module <- class(module, "module")
+  addMetaData(module)
 
 }

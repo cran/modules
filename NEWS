@@ -1,3 +1,13 @@
+Version 0.6.0
+- CRAN release
+- Fixing conditional use of packages in suggests
+
+Version 0.5.2
+- Update documentation for parameterized modules.
+
+Version 0.5.1
+- New function: extend, can be used to extend an existing module definition.
+
 Version 0.5.0
 - CRAN release
 
