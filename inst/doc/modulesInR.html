@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-<meta name="date" content="2017-07-18" />
+<meta name="date" content="2018-07-15" />
 
 <title>Modules in R</title>
 
@@ -68,7 +68,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Modules in R</h1>
-<h4 class="date"><em>2017-07-18</em></h4>
+<h4 class="date"><em>2018-07-15</em></h4>
 
 
 
@@ -78,7 +78,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>From CRAN:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;modules&quot;</span>)</code></pre></div>
 <p>From GitHub:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if (<span class="kw">require</span>(<span class="st">&quot;devtools&quot;</span>)) <span class="kw">install_github</span>(<span class="st">&quot;wahani/modules&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="kw">require</span>(<span class="st">&quot;devtools&quot;</span>)) <span class="kw">install_github</span>(<span class="st">&quot;wahani/modules&quot;</span>)</code></pre></div>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -87,43 +87,43 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Some core features:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;modules&quot;</span>)
 m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  boringFunction &lt;-<span class="st"> </span>function() <span class="st">&quot;boring output&quot;</span>
+  boringFunction &lt;-<span class="st"> </span><span class="cf">function</span>() <span class="st">&quot;boring output&quot;</span>
 })
-m$<span class="kw">boringFunction</span>()</code></pre></div>
+m<span class="op">$</span><span class="kw">boringFunction</span>()</code></pre></div>
 <pre><code>## [1] &quot;boring output&quot;</code></pre>
 <p>Since they are isolated from the <code>.GlobalEnv</code> the following object <code>x</code> can not be found:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> &quot;hey&quot;</span>
 m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  someFunction &lt;-<span class="st"> </span>function() x
+  someFunction &lt;-<span class="st"> </span><span class="cf">function</span>() x
 })
-m$<span class="kw">someFunction</span>()</code></pre></div>
-<pre><code>## Error in m$someFunction(): object 'x' not found</code></pre>
+m<span class="op">$</span><span class="kw">someFunction</span>()</code></pre></div>
+<pre><code>## Error in m$someFunction(): Objekt 'x' nicht gefunden</code></pre>
 <div id="imports" class="section level2">
 <h2>Imports</h2>
 <p>If you rely on exported objects of a package you can refer to them explicitly using <code>::</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  functionWithDep &lt;-<span class="st"> </span>function(x) stats::<span class="kw">median</span>(x)
+  functionWithDep &lt;-<span class="st"> </span><span class="cf">function</span>(x) stats<span class="op">::</span><span class="kw">median</span>(x)
 })
-m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+m<span class="op">$</span><span class="kw">functionWithDep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</code></pre></div>
 <pre><code>## [1] 5.5</code></pre>
 <p>Or you can use <code>import</code> for <em>attaching</em> single objects or packages and <code>use</code> for <em>attaching</em> or loading a module:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
 
   <span class="kw">import</span>(<span class="st">&quot;stats&quot;</span>, <span class="st">&quot;median&quot;</span>) <span class="co"># make median from package stats available</span>
 
-  functionWithDep &lt;-<span class="st"> </span>function(x) <span class="kw">median</span>(x)
+  functionWithDep &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">median</span>(x)
 
 })
-m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+m<span class="op">$</span><span class="kw">functionWithDep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</code></pre></div>
 <pre><code>## [1] 5.5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
 
   <span class="kw">import</span>(<span class="st">&quot;stats&quot;</span>)
 
-  functionWithDep &lt;-<span class="st"> </span>function(x) <span class="kw">median</span>(x)
+  functionWithDep &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">median</span>(x)
 
 })
-m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class="dv">10</span>)</code></pre></div>
+m<span class="op">$</span><span class="kw">functionWithDep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</code></pre></div>
 <pre><code>## [1] 5.5</code></pre>
 </div>
 <div id="exports" class="section level2">
@@ -149,20 +149,20 @@ m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class=
 <p>One example where you may want to have more control of the enclosing environment of a function is when you parallelize your code. First consider the case when a <em>naive</em> implementation fails.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">&quot;parallel&quot;</span>)
 dependency &lt;-<span class="st"> </span>identity
-fun &lt;-<span class="st"> </span>function(x) <span class="kw">dependency</span>(x) 
+fun &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">dependency</span>(x) 
 
 cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>)
-<span class="kw">clusterMap</span>(cl, fun, <span class="dv">1</span>:<span class="dv">2</span>)</code></pre></div>
-<pre><code>## Error in checkForRemoteErrors(val): 2 nodes produced errors; first error: could not find function &quot;dependency&quot;</code></pre>
+<span class="kw">clusterMap</span>(cl, fun, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</code></pre></div>
+<pre><code>## Error in checkForRemoteErrors(val): 2 nodes produced errors; first error: konnte Funktion &quot;dependency&quot; nicht finden</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)</code></pre></div>
 <p>To make the function <code>fun</code> self contained we can define it in a module.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
   dependency &lt;-<span class="st"> </span>identity
-  fun &lt;-<span class="st"> </span>function(x) <span class="kw">dependency</span>(x) 
+  fun &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">dependency</span>(x) 
 })
 
 cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>)
-<span class="kw">clusterMap</span>(cl, m$fun, <span class="dv">1</span>:<span class="dv">2</span>)</code></pre></div>
+<span class="kw">clusterMap</span>(cl, m<span class="op">$</span>fun, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</code></pre></div>
 <pre><code>## [[1]]
 ## [1] 1
 ## 
@@ -191,7 +191,7 @@ fileName &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span cl
 <span class="kw">writeLines</span>(code, fileName)</code></pre></div>
 <p>Then we can load such a module into this session by the following:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">use</span>(fileName)
-m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class="dv">2</span>)</code></pre></div>
+m<span class="op">$</span><span class="kw">functionWithDep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</code></pre></div>
 <pre><code>## [1] 1.5</code></pre>
 </div>
 <div id="nested-modules" class="section level1">
@@ -203,31 +203,31 @@ m$<span class="kw">functionWithDep</span>(<span class="dv">1</span>:<span class=
   <span class="kw">import</span>(<span class="st">&quot;modules&quot;</span>, <span class="st">&quot;module&quot;</span>)
 
   anotherModule &lt;-<span class="st"> </span><span class="kw">module</span>({
-    fun &lt;-<span class="st"> </span>function(x) <span class="kw">median</span>(x)
+    fun &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">median</span>(x)
   })
 
 })
 
-m$anotherModule$<span class="kw">fun</span>(<span class="dv">1</span>:<span class="dv">2</span>)</code></pre></div>
+m<span class="op">$</span>anotherModule<span class="op">$</span><span class="kw">fun</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</code></pre></div>
 <pre><code>## [1] 1.5</code></pre>
 </div>
 <div id="parameterized-modules" class="section level1">
 <h1>Parameterized Modules</h1>
 <p>Sometimes it can be useful to pass arguments to a module. If you have a background in object oriented programming you may find this natural. From a functional perspective we define parameters shared by a list of closures. This is achieved by making the enclosing environment of the module available to the module itself. Note that inside a package this would be the default behaviour.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span>function(param) {
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="cf">function</span>(param) {
   <span class="kw">module</span>(<span class="dt">topEncl =</span> <span class="kw">environment</span>(), {
-    fun &lt;-<span class="st"> </span>function() param
+    fun &lt;-<span class="st"> </span><span class="cf">function</span>() param
   })
 }
 
-<span class="kw">m</span>(<span class="dv">1</span>)$<span class="kw">fun</span>()</code></pre></div>
+<span class="kw">m</span>(<span class="dv">1</span>)<span class="op">$</span><span class="kw">fun</span>()</code></pre></div>
 <pre><code>## [1] 1</code></pre>
 </div>
 <div id="documentation" class="section level1">
 <h1>Documentation</h1>
 <p>If you want proper documentation for your functions or modules you really want a package. However, there are some simple things you can do for ad-hoc documentation of modules which is to use comments:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">module</span>({
-  fun &lt;-<span class="st"> </span>function(x) {
+  fun &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
     ## A function for illustrating documentation
     ## x (numeric)
     x
@@ -248,11 +248,11 @@ m$anotherModule$<span class="kw">fun</span>(<span class="dv">1</span>:<span clas
 <h2>S3</h2>
 <p>S3 method dispatch can be problematic because of the special search mechanism of <code>UseMethod</code>. What will work, however, is wrapping the generic function in a wrapper function.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">module</span>({
-  .generic &lt;-<span class="st"> </span>function(x) <span class="kw">UseMethod</span>(<span class="st">&quot;generic&quot;</span>)
-  generic.numeric &lt;-<span class="st"> </span>function(x) <span class="kw">cat</span>(<span class="st">&quot;method for x ~ numeric&quot;</span>)
-  generic &lt;-<span class="st"> </span>function(x) <span class="kw">.generic</span>(x)
+  .generic &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">UseMethod</span>(<span class="st">&quot;generic&quot;</span>)
+  generic.numeric &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">cat</span>(<span class="st">&quot;method for x ~ numeric&quot;</span>)
+  generic &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">.generic</span>(x)
 })
-m$<span class="kw">generic</span>(<span class="dv">1</span>)</code></pre></div>
+m<span class="op">$</span><span class="kw">generic</span>(<span class="dv">1</span>)</code></pre></div>
 <pre><code>## method for x ~ numeric</code></pre>
 </div>
 <div id="s4" class="section level2">
@@ -269,52 +269,52 @@ m$<span class="kw">generic</span>(<span class="dv">1</span>)</code></pre></div>
 <p>In the following I define a module to encapsulate some value and have a <em>get</em> and <em>set</em> method for it:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mutableModule &lt;-<span class="st"> </span><span class="kw">module</span>({
   .num &lt;-<span class="st"> </span><span class="ot">NULL</span>
-  get &lt;-<span class="st"> </span>function() .num
-  set &lt;-<span class="st"> </span>function(val) .num &lt;&lt;-<span class="st"> </span>val
+  get &lt;-<span class="st"> </span><span class="cf">function</span>() .num
+  set &lt;-<span class="st"> </span><span class="cf">function</span>(val) .num &lt;&lt;-<span class="st"> </span>val
 })
-mutableModule$<span class="kw">get</span>()</code></pre></div>
+mutableModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## NULL</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mutableModule$<span class="kw">set</span>(<span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mutableModule<span class="op">$</span><span class="kw">set</span>(<span class="dv">2</span>)</code></pre></div>
 </div>
 <div id="coupling-between-modules" class="section level2">
 <h2>Coupling Between Modules</h2>
 <p>In the next module we can use <code>mutableModule</code> and rebuild the interface to <code>.num</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule &lt;-<span class="st"> </span><span class="kw">module</span>({
-  <span class="kw">use</span>(.GlobalEnv$mutableModule, <span class="dt">attach =</span> <span class="ot">TRUE</span>)
-  getNum &lt;-<span class="st"> </span>function() <span class="kw">get</span>()
+  <span class="kw">use</span>(.GlobalEnv<span class="op">$</span>mutableModule, <span class="dt">attach =</span> <span class="ot">TRUE</span>)
+  getNum &lt;-<span class="st"> </span><span class="cf">function</span>() <span class="kw">get</span>()
   <span class="kw">set</span>(<span class="dv">3</span>)
 })
-mutableModule$<span class="kw">get</span>()</code></pre></div>
+mutableModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## [1] 2</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule$<span class="kw">getNum</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule<span class="op">$</span><span class="kw">getNum</span>()</code></pre></div>
 <pre><code>## [1] 3</code></pre>
 <p>Depending on your expectations with respect to the above code it comes at a surprise that we can get and set that value from an attached module; Furthermore it is not changed in <code>mutableModule</code>. This is because <code>use</code> will trigger a re-initialization of any module you plug in. You can override this behaviour:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule &lt;-<span class="st"> </span><span class="kw">module</span>({
-  <span class="kw">use</span>(.GlobalEnv$mutableModule, <span class="dt">attach =</span> <span class="ot">TRUE</span>, <span class="dt">reInit =</span> <span class="ot">FALSE</span>)
-  getNum &lt;-<span class="st"> </span>function() <span class="kw">get</span>()
+  <span class="kw">use</span>(.GlobalEnv<span class="op">$</span>mutableModule, <span class="dt">attach =</span> <span class="ot">TRUE</span>, <span class="dt">reInit =</span> <span class="ot">FALSE</span>)
+  getNum &lt;-<span class="st"> </span><span class="cf">function</span>() <span class="kw">get</span>()
   <span class="kw">set</span>(<span class="dv">3</span>)
 })
-mutableModule$<span class="kw">get</span>()</code></pre></div>
+mutableModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## [1] 3</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule$<span class="kw">getNum</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule<span class="op">$</span><span class="kw">getNum</span>()</code></pre></div>
 <pre><code>## [1] 3</code></pre>
 <p>This is not all we can do. Also we can use <code>expose</code>. This function will take everything in a module and expose it to the environment from which it is called.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule &lt;-<span class="st"> </span><span class="kw">module</span>({
-  <span class="kw">expose</span>(.GlobalEnv$mutableModule, <span class="dt">reInit =</span> <span class="ot">TRUE</span>)
+  <span class="kw">expose</span>(.GlobalEnv<span class="op">$</span>mutableModule, <span class="dt">reInit =</span> <span class="ot">TRUE</span>)
   <span class="kw">set</span>(<span class="dv">4</span>)
 })
-mutableModule$<span class="kw">get</span>()</code></pre></div>
+mutableModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## [1] 3</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule$<span class="kw">get</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## [1] 4</code></pre>
 <p>And of course we can do this with <code>reInit = FALSE</code> should this be desirable. In this case both modules are essentially a copy of a reference.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule &lt;-<span class="st"> </span><span class="kw">module</span>({
-  <span class="kw">expose</span>(.GlobalEnv$mutableModule, <span class="dt">reInit =</span> <span class="ot">FALSE</span>)
+  <span class="kw">expose</span>(.GlobalEnv<span class="op">$</span>mutableModule, <span class="dt">reInit =</span> <span class="ot">FALSE</span>)
   <span class="kw">set</span>(<span class="dv">1</span>)
 })
-mutableModule$<span class="kw">get</span>()</code></pre></div>
+mutableModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## [1] 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule$<span class="kw">get</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">complectModule<span class="op">$</span><span class="kw">get</span>()</code></pre></div>
 <pre><code>## [1] 1</code></pre>
 </div>
 </div>
