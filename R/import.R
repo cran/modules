@@ -9,6 +9,8 @@
 #' @param where (environment) typically the calling environment. Should only be
 #'   relevant for testing.
 #' @param attach (logical) whether to attach the imports to the search path.
+#' @param except (character | NULL) a character vactor excluding any packages
+#' from being imported.
 #'
 #' @details
 #' \code{import} and \link{use} can replace \link{library} and \link{attach}.
@@ -55,6 +57,17 @@ import <- function(from, ..., attach = TRUE, where = parent.frame()) {
   invisible(parent.env(where))
 }
 
+#' @export
+#' @rdname import
+importDefaultPackages <- function(except = NULL, where = parent.frame()) {
+  pkgs <- getOption(
+    "defaultPackages",
+    c("datasets", "utils", "grDevices", "graphics", "stats", "methods"))
+  pkgs <- setdiff(pkgs, except)
+  if ("methods" %in% pkgs) pkgs <- unique(c("methods", pkgs))
+  for (pkg in pkgs) do.call(modules::import, list(from = pkg), envir = where)
+}
+
 importCheckAttach <- function(where, attach) {
   if (!attach) new.env(parent = baseenv()) else where
 }
@@ -74,7 +87,7 @@ importCheckInstall <- function(pkg) {
 
 importGetSelection <- function(mc, pkg) {
   objectsToImport <- importDeparseEllipses(mc)
-  if (length(objectsToImport) == 0) getNamespaceExports(pkg)
+  if (length(objectsToImport) == 0) importGetNamespaceExports(pkg)
   else objectsToImport
 }
 
@@ -86,4 +99,12 @@ importDeparseEllipses <- function(mc) {
   args$attach <- NULL
   args <- unlist(args)
   deleteQuotes(args)
+}
+
+importGetNamespaceExports <- function(pkg) {
+  nsExports <- getNamespaceExports(pkg)
+  nsDatasets <- data(package = pkg)
+  nsDatasets <- nsDatasets$results[, "Item"]
+  nsDatasets <- gsub(" .*", "", nsDatasets)
+  c(nsExports, nsDatasets)
 }

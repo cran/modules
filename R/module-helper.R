@@ -4,12 +4,20 @@ deparseEllipsis <- function(mc, exclude) {
   args <- Map(deparse, mc)
   args[[1]] <- NULL
   args[exclude] <- NULL
+  args <- lapply(args, paste0, collapse = "\n")
   args <- unlist(args)
   deleteQuotes(args)
 }
 
 deleteQuotes <- function(x) {
-  gsub("\\\"|\\\'", "", x)
+  res <- vapply(
+    x, FUN.VALUE = character(1),
+    function(e) {
+      if (grepl("^[\\\"\\\'].*[\\\"\\\']$", e)) gsub("\\\"|\\\'", "", e)
+      else e
+    })
+  if (is.null(names(x))) names(res) <- NULL
+  res
 }
 
 addDependency <- function(from, what, where, assignFun, name) {
@@ -18,7 +26,7 @@ addDependency <- function(from, what, where, assignFun, name) {
   # from (list | env | pkg) a collection which is subset-able with [
   # what (character) names of values in from
   # where (environment) where the search path begins
-  # assignFun (function) how to put 'from::what' 'into' 
+  # assignFun (function) how to put 'from::what' 'into'
   # name (character) the name on the search path
 
   addPrefix <- function(name) paste0("modules:", name)
@@ -42,8 +50,12 @@ addDependency <- function(from, what, where, assignFun, name) {
       packageStartupMessage(
         "Replacing attached import/use on search path for: ",
         addPrefix(name), ".")
-      if (pos == 1) parent.env(where) <- sp[[2]]
-      else parent.env(sp[[pos - 1]]) <- sp[[pos + 1]]
+      if (identical(globalenv(), where)) {
+        detach(pos = pos)
+      } else {
+        if (pos == 1) parent.env(where) <- sp[[2]]
+        else parent.env(sp[[pos - 1]]) <- sp[[pos + 1]]
+      }
     }
   }
 

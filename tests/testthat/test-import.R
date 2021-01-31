@@ -1,3 +1,54 @@
+test_that("Import of default packages: #31", {
+
+  # import default packages, e.g. stats, utils, etc
+  m <- module(topEncl = baseenv(), {
+    suppressPackageStartupMessages(importDefaultPackages())
+    findsStats <- function() exists("median")
+    findsUtils <- function() exists("data")
+    findsGraphics <- function() exists("plot")
+    findsDatasets <- function() exists("iris")
+  })
+
+  for (fun in m) {
+    testthat::expect_true(fun())
+  }
+
+  # now exclude datasets and utils
+  m <- module(topEncl = baseenv(), {
+    suppressPackageStartupMessages(importDefaultPackages(
+      c("datasets", "utils")
+    ))
+    findsStats <- function() exists("median")
+    findsUtils <- function() !exists("data")
+    findsGraphics <- function() exists("plot")
+    findsDatasets <- function() !exists("iris")
+  })
+
+  for (fun in m) {
+    testthat::expect_true(fun())
+  }
+
+})
+
+test_that("Import of datasets: #29", {
+  # import all datasets from a package
+  m <- module({
+    import("datasets")
+    getIris <- function() iris
+  })
+  data("iris", envir = environment())
+  expect_equal(m$getIris(), iris)
+  expect_true("iris" %in% getSearchPathContent(m)[["modules:datasets"]])
+  # import just one dataset, like any other object
+  m <- module({
+    import("datasets", "iris")
+    getIris <- function() iris
+  })
+  data("iris", envir = environment())
+  expect_equal(m$getIris(), iris)
+  expect_true("iris" %in% getSearchPathContent(m)[["modules:datasets"]])
+})
+
 test_that("Imports of module", {
   # import and related functions are part of the parent scope. Not the module
   # itself.
@@ -42,8 +93,8 @@ test_that("delayed assignment", {
   # When 'temp' is called, it should not find 'assignment'
   expect_error(m$temp())
   expect_true(m$checkExistens())
-
 })
+
 test_that("package dependencies", {
 
   m <- module({
@@ -55,47 +106,6 @@ test_that("package dependencies", {
   testthat::expect_error(module({
     import("DoesNotExist")
   }), "'package:DoesNotExist' is not installed!")
-
-})
-
-test_that("cross package deps", {
-  ## We skip this test on CRAN because it leads to errors on fedora and debian.
-  ## I cannot reproduce these errors on ubuntu 18.10
-  testthat::skip_on_cran()
-  if (requireNamespace("disposables", quietly = TRUE)) {
-    disposables::make_packages(
-
-      imports = "modules",
-
-      M1 = {
-        m1 <- module({
-          fun <- function(x) x
-        })
-      },
-
-      M2 = {
-        m2 <- module({
-          import(M1, m1)
-          newFun <- function(...) m1$fun(...)
-        })
-      }
-
-    )
-
-    m1 <- module(
-      topEncl = baseenv(),
-      fun <- function(x) x
-    )
-
-    expect_equal(
-      environmentName(parent.env(parent.env(environment(M1::m1$fun)))),
-      "M1"
-    )
-
-    expect_equal(
-      environmentName(parent.env(parent.env(environment(m1$fun)))),
-      "base"
-    )}
 
 })
 
