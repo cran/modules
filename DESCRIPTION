@@ -1,6 +1,6 @@
 Package: modules
 Title: Self Contained Units of Source Code
-Version: 0.9.0
+Version: 0.10.0
 Authors@R: person("Sebastian", "Warnholz", email = "wahani@gmail.com", role = c("aut", "cre"))
 Description: Provides modules as an organizational unit for source code. Modules
     enforce to be more rigorous when defining dependencies and have
@@ -22,8 +22,8 @@ Collate: 'amodule.R' 'NAMESPACE.R' 'getSearchPath.R' 'class.R'
         'module.R' 'use.R' 'testModule.R' 'base-override.R'
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-01-31 07:35:35 UTC; swarnholz
+Packaged: 2021-02-06 21:03:36 UTC; lswarnholz
 Author: Sebastian Warnholz [aut, cre]
 Maintainer: Sebastian Warnholz <wahani@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-01-31 08:00:02 UTC
+Date/Publication: 2021-02-06 22:40:03 UTC
