@@ -11,10 +11,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2021-02-06" />
+<meta name="date" content="2023-06-10" />
 
 <title>Modules: Organizing R Source Code</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -26,28 +55,37 @@
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -56,9 +94,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -98,13 +136,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -309,7 +354,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Modules: Organizing R Source Code</h1>
-<h4 class="date">2021-02-06</h4>
+<h4 class="date">2023-06-10</h4>
 
 
 
@@ -326,18 +371,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="example" class="section level1">
 <h1>Example</h1>
 <p>You can load scripts as modules when you refer to a file (or directory) in a call to <code>use</code>. Inside such a script you can use <code>import</code> and <code>use</code> in the same way you typically use <code>library</code>. Consider the following example where we create a module in a temporary file with its dependencies.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">code &lt;-<span class="st"> &quot;</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="st">import(&#39;stats&#39;, &#39;median&#39;)</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="st">functionWithDep &lt;- function(x) median(x)</span></a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="st">&quot;</span></a>
-<a class="sourceLine" id="cb1-5" title="5"></a>
-<a class="sourceLine" id="cb1-6" title="6">fileName &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span class="dt">fileext =</span> <span class="st">&quot;.R&quot;</span>)</a>
-<a class="sourceLine" id="cb1-7" title="7"><span class="kw">writeLines</span>(code, fileName)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>code &lt;-<span class="st"> &quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="st">import(&#39;stats&#39;, &#39;median&#39;)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="st">functionWithDep &lt;- function(x) median(x)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="st">&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>fileName &lt;-<span class="st"> </span><span class="kw">tempfile</span>(<span class="dt">fileext =</span> <span class="st">&quot;.R&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">writeLines</span>(code, fileName)</span></code></pre></div>
 <p>Then we can load such a module into this session by the following:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(modules)</a>
-<a class="sourceLine" id="cb2-2" title="2">m &lt;-<span class="st"> </span><span class="kw">use</span>(fileName)</a>
-<a class="sourceLine" id="cb2-3" title="3">m<span class="op">$</span><span class="kw">functionWithDep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-4" title="4"><span class="co">#&gt; [1] 1.5</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">library</span>(modules)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>m &lt;-<span class="st"> </span><span class="kw">use</span>(fileName)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>m<span class="op">$</span><span class="kw">functionWithDep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">#&gt; [1] 1.5</span></span></code></pre></div>
 </div>
 <div id="pseudo-code-example" class="section level1">
 <h1>Pseudo-code example</h1>
@@ -356,47 +401,47 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
   README.md</code></pre>
 <p>You put all your R code into the <code>R</code> folder. This folder may or may not have a nested folder structure itself. You probably have a folder for your data and one into which you store all results. The important part here is that you have split your code base into different files. <code>main.R</code> in the project root acts as the <em>master</em> file in this example. This file kicks of all steps of our analysis and <em>connects the dots</em>. <code>munging.R</code> and <code>graphics.R</code> implement helper functions.</p>
 <p><strong>main.R</strong></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">lib &lt;-<span class="st"> </span>modules<span class="op">::</span><span class="kw">use</span>(<span class="st">&quot;R&quot;</span>)</a>
-<a class="sourceLine" id="cb4-2" title="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/some.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb4-3" title="3"></a>
-<a class="sourceLine" id="cb4-4" title="4"><span class="co"># munging</span></a>
-<a class="sourceLine" id="cb4-5" title="5">dat &lt;-<span class="st"> </span>lib<span class="op">$</span>munging<span class="op">$</span><span class="kw">clean</span>(dat)</a>
-<a class="sourceLine" id="cb4-6" title="6">dat &lt;-<span class="st"> </span>lib<span class="op">$</span>munging<span class="op">$</span><span class="kw">recode</span>(dat)</a>
-<a class="sourceLine" id="cb4-7" title="7"></a>
-<a class="sourceLine" id="cb4-8" title="8"><span class="co"># generate results</span></a>
-<a class="sourceLine" id="cb4-9" title="9">lib<span class="op">$</span>graphics<span class="op">$</span><span class="kw">barplot</span>(dat)</a>
-<a class="sourceLine" id="cb4-10" title="10">lib<span class="op">$</span>graphics<span class="op">$</span><span class="kw">lineplot</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>lib &lt;-<span class="st"> </span>modules<span class="op">::</span><span class="kw">use</span>(<span class="st">&quot;R&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/some.csv&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co"># munging</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>dat &lt;-<span class="st"> </span>lib<span class="op">$</span>munging<span class="op">$</span><span class="kw">clean</span>(dat)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>dat &lt;-<span class="st"> </span>lib<span class="op">$</span>munging<span class="op">$</span><span class="kw">recode</span>(dat)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a><span class="co"># generate results</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>lib<span class="op">$</span>graphics<span class="op">$</span><span class="kw">barplot</span>(dat)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>lib<span class="op">$</span>graphics<span class="op">$</span><span class="kw">lineplot</span>(dat)</span></code></pre></div>
 <p>The <code>main.R</code> file implements no logic of the analysis. Its responsibility is to connect all steps. Each file in the <code>R</code> folder then implements a <em>phase</em> of the project. In larger projects it is likely that each phase will need its own folder. The implementation may then look something along the lines of:</p>
 <p><strong>R/munging.R</strong></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">export</span>(<span class="st">&quot;clean&quot;</span>)</a>
-<a class="sourceLine" id="cb5-2" title="2">clean &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</a>
-<a class="sourceLine" id="cb5-3" title="3">  <span class="co"># ...</span></a>
-<a class="sourceLine" id="cb5-4" title="4">}</a>
-<a class="sourceLine" id="cb5-5" title="5"></a>
-<a class="sourceLine" id="cb5-6" title="6"><span class="kw">export</span>(<span class="st">&quot;recode&quot;</span>)</a>
-<a class="sourceLine" id="cb5-7" title="7">recode &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</a>
-<a class="sourceLine" id="cb5-8" title="8">  <span class="co"># ...</span></a>
-<a class="sourceLine" id="cb5-9" title="9">}</a>
-<a class="sourceLine" id="cb5-10" title="10"></a>
-<a class="sourceLine" id="cb5-11" title="11">helper &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</a>
-<a class="sourceLine" id="cb5-12" title="12">  <span class="co"># This function is private</span></a>
-<a class="sourceLine" id="cb5-13" title="13">  <span class="co"># ...</span></a>
-<a class="sourceLine" id="cb5-14" title="14">}</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">export</span>(<span class="st">&quot;clean&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>clean &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>  <span class="co"># ...</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>}</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="kw">export</span>(<span class="st">&quot;recode&quot;</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>recode &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>  <span class="co"># ...</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>}</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>helper &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>  <span class="co"># This function is private</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>  <span class="co"># ...</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a>}</span></code></pre></div>
 <p><strong>R/graphics.R</strong></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">import</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="kw">export</span>(<span class="st">&quot;barplot&quot;</span>, <span class="st">&quot;lineplot&quot;</span>)</a>
-<a class="sourceLine" id="cb6-3" title="3"></a>
-<a class="sourceLine" id="cb6-4" title="4">barplot &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</a>
-<a class="sourceLine" id="cb6-5" title="5">  <span class="co"># ...</span></a>
-<a class="sourceLine" id="cb6-6" title="6">}</a>
-<a class="sourceLine" id="cb6-7" title="7"></a>
-<a class="sourceLine" id="cb6-8" title="8">lineplot &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</a>
-<a class="sourceLine" id="cb6-9" title="9">  <span class="co"># ...</span></a>
-<a class="sourceLine" id="cb6-10" title="10">}</a>
-<a class="sourceLine" id="cb6-11" title="11"></a>
-<a class="sourceLine" id="cb6-12" title="12">helper &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</a>
-<a class="sourceLine" id="cb6-13" title="13">  <span class="co"># ...</span></a>
-<a class="sourceLine" id="cb6-14" title="14">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">import</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="kw">export</span>(<span class="st">&quot;barplot&quot;</span>, <span class="st">&quot;lineplot&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>barplot &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>  <span class="co"># ...</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>lineplot &lt;-<span class="st"> </span><span class="cf">function</span>(dat) {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>  <span class="co"># ...</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>}</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>helper &lt;-<span class="st"> </span><span class="cf">function</span>(...) {</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>  <span class="co"># ...</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>}</span></code></pre></div>
 <ul>
 <li>Each file is coerced into a module and can have its own set of imports. They do not share them.</li>
 <li>Loading the complete folder, or each module individually is a matter of preference. Loading complete folders saves a couple of lines.</li>
@@ -406,17 +451,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="documentation" class="section level1">
 <h1>Documentation</h1>
 <p>If you want proper documentation for your functions or modules you really want a package. There are some simple things you can do for ad-hoc documentation of modules which is to use comments:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">module</span>({</a>
-<a class="sourceLine" id="cb7-2" title="2">  fun &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb7-3" title="3">    <span class="co">## A function for illustrating documentation</span></a>
-<a class="sourceLine" id="cb7-4" title="4">    <span class="co">## x (numeric) some values</span></a>
-<a class="sourceLine" id="cb7-5" title="5">    x</a>
-<a class="sourceLine" id="cb7-6" title="6">  }</a>
-<a class="sourceLine" id="cb7-7" title="7">})</a>
-<a class="sourceLine" id="cb7-8" title="8"><span class="co">#&gt; fun:</span></a>
-<a class="sourceLine" id="cb7-9" title="9"><span class="co">#&gt; function(x)</span></a>
-<a class="sourceLine" id="cb7-10" title="10"><span class="co">#&gt; ## A function for illustrating documentation</span></a>
-<a class="sourceLine" id="cb7-11" title="11"><span class="co">#&gt; ## x (numeric) some values</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">module</span>({</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  fun &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    <span class="co">## A function for illustrating documentation</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    <span class="co">## x (numeric) some values</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>    x</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  }</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>})</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">#&gt; fun:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="co">#&gt; function(x)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co">#&gt; ## A function for illustrating documentation</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">#&gt; ## x (numeric) some values</span></span></code></pre></div>
 </div>
 <div id="best-practices" class="section level1">
 <h1>Best practices</h1>

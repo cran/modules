@@ -1,5 +1,5 @@
 ## ---- results='asis', echo=FALSE----------------------------------------------
-cat(gsub("\\n   ", "", packageDescription("modules", fields = "Description",encoding = NA)))
+cat(gsub("\\n   ", "", packageDescription("modules", fields = "Description", encoding = NA)))
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  install.packages("modules")
@@ -34,22 +34,18 @@ m$functionWithDep(1:10)
 
 ## -----------------------------------------------------------------------------
 m <- module({
-
   import("stats", "median") # make median from package stats available
 
   functionWithDep <- function(x) median(x)
-
 })
 m$functionWithDep(1:10)
 getSearchPathContent(m)
 
 ## -----------------------------------------------------------------------------
 m <- module({
-
   import("stats")
 
   functionWithDep <- function(x) median(x)
-
 })
 m$functionWithDep(1:10)
 
@@ -68,7 +64,6 @@ mm$anotherFunction(1:10)
 
 ## -----------------------------------------------------------------------------
 m <- module({
-
   export("fun")
 
   fun <- identity # public
@@ -76,7 +71,6 @@ m <- module({
 
   # .named are always private
   .privateFunction <- identity
-
 })
 
 m
