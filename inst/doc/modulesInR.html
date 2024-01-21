@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2023-08-25" />
+<meta name="date" content="2024-01-20" />
 
 <title>Modules in R</title>
 
@@ -354,7 +354,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Modules in R</h1>
-<h4 class="date">2023-08-25</h4>
+<h4 class="date">2024-01-20</h4>
 
 
 
@@ -399,7 +399,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>  someFunction &lt;-<span class="st"> </span><span class="cf">function</span>() x</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>})</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>m<span class="op">$</span><span class="kw">someFunction</span>()</span></code></pre></div>
-<pre><code>## Error in m$someFunction(): Objekt &#39;x&#39; nicht gefunden</code></pre>
+<pre><code>## Error in m$someFunction(): object &#39;x&#39; not found</code></pre>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">getSearchPathContent</span>(m)</span></code></pre></div>
 <pre><code>## List of 4
 ##  $ modules:root     : chr &quot;someFunction&quot;
@@ -499,7 +499,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a></span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true"></a>cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>)</span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true"></a><span class="kw">clusterMap</span>(cl, fun, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</span></code></pre></div>
-<pre><code>## Error in checkForRemoteErrors(val): 2 nodes produced errors; first error: konnte Funktion &quot;dependency&quot; nicht finden</code></pre>
+<pre><code>## Error in checkForRemoteErrors(val): 2 nodes produced errors; first error: could not find function &quot;dependency&quot;</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="kw">stopCluster</span>(cl)</span></code></pre></div>
 <p>To make the function <code>fun</code> self contained we can define it in a module.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a>m &lt;-<span class="st"> </span><span class="kw">module</span>({</span>
